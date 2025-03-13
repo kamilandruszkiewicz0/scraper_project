@@ -10,10 +10,10 @@ __pycache__/
 *.log
 logs/
 
-# Ignore Terraform local state files
+# Ignore Terraform state and provider files
+.terraform/
 terraform.tfstate
 terraform.tfstate.backup
-.terraform/
 
 # Ignore secrets and credentials
 .env
