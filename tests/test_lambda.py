@@ -1,5 +1,9 @@
 import json
 import pytest
+import sys
+import os 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from lambda_function import lambda_handler
 
 def test_lambda_static():
@@ -30,6 +34,6 @@ def test_lambda_invalid_url():
     event = {"url": "invalid-url", "mode": "static"}
     response = lambda_handler(event, None)
 
-    assert response["statusCode"] in [400, 500]
+    assert response["statusCode"] == 400
     body = json.loads(response["body"])
-    assert "error" in body
+    assert body["error"] == "Invalid URL format"

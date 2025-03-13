@@ -1,18 +1,28 @@
+import re
 import requests
 from bs4 import BeautifulSoup
 from scraper.retry_logic import retry_request
 from scraper.proxy_manager import get_headers, get_proxy
-from scraper.selenium_scraper import scrape_dynamic_website  
+from urllib.parse import urlparse
 
-def scrape_website(url, mode="static"):
-    if mode == "dynamic":
-        return scrape_dynamic_website(url)
+def is_valid_url(url):
+    try:
+        result = urlparse(url)
+        return all([result.scheme in ['http', 'https'], result.netloc])
+    except ValueError:
+        return False
+
+def scrape_website(url):
+    if not is_valid_url(url):  
+        return {"statusCode": 400, "body": "Invalid URL format"}
 
     headers = get_headers()
-    response = retry_request(lambda: requests.get(url, headers=headers, timeout=10, proxies=get_proxy()))
+    proxy = get_proxy()
 
-    if not response:
-        return {"error": "Failed to fetch data"}
+    response = retry_request(lambda: requests.get(url, headers=headers, timeout=10, proxies=proxy))
+
+    if not response or response.status_code != 200:
+        return {"statusCode": 500, "body": "Failed to fetch data"}
 
     soup = BeautifulSoup(response.text, 'html.parser')
     data = {
@@ -20,5 +30,4 @@ def scrape_website(url, mode="static"):
         "paragraphs": [item.text.strip() for item in soup.find_all('p')],
         "links": [a["href"] for a in soup.find_all('a', href=True)]
     }
-    return {"scraped_data": data}
-
+    return {"statusCode": 200, "scraped_data": data}
