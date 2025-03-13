@@ -1,0 +1,33 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint code with flake8
+        run: pip install flake8 && flake8
+
+      - name: Run tests
+        run: pytest tests/
+
+      - name: Package and deploy Lambda
+        run: |
+          zip -r lambda_function.zip src/
+          aws lambda update-function-code --function-name scraper_lambda --zip-file fileb://lambda_function.zip
+
+      - name: Deploy infrastructure with Terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform apply -auto-approve

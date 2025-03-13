@@ -1,0 +1,19 @@
+{
+    "StartAt": "Scrape Websites",
+    "States": {
+        "Scrape Websites": {
+            "Type": "Map",
+            "Iterator": {
+                "StartAt": "Run Lambda",
+                "States": {
+                    "Run Lambda": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:lambda:region:function:scraper_lambda",
+                        "End": true
+                    }
+                }
+            },
+            "End": true
+        }
+    }
+}
