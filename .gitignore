@@ -6,17 +6,16 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Ignore logs
+*.log
+logs/
+
 # Ignore Terraform local state files
 terraform.tfstate
 terraform.tfstate.backup
 .terraform/
 
-# Ignore log files
-*.log
-logs/
-debug.log
-
-# Ignore environment variables and credentials
+# Ignore secrets and credentials
 .env
-*.pem  # AWS private keys
-.aws/  # AWS config directory
+*.pem
+.aws/
